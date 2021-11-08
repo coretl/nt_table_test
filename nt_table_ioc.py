@@ -51,7 +51,7 @@ def switch_editable(e):
 
 
 editable = builder.mbbOut("EDITABLE", "No", "Yes", initial_value=0, on_update=switch_editable)
-editable_start = records.ao("EDITABLE:START", VAL=1, OUT=PP(editable))
+editable_start = records.ao("EDITABLE:START", VAL=1, MDEL=-1, OUT=PP(editable))
 editable_start.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "_start":{"+type":"proc",
@@ -60,7 +60,7 @@ editable_start.add_info("Q:group", {
                 "+trigger":"*"}
     }
 })
-editable_end = records.ao("EDITABLE:END", VAL=0, OUT=PP(editable))
+editable_end = records.ao("EDITABLE:END", VAL=0, MDEL=-1, OUT=PP(editable))
 editable_end.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "_end":{"+type":"proc",
