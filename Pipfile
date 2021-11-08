@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+softioc = "*"
+epicsdbbuilder = {editable = true,git = "https://github.com/dls-controls/epicsdbbuilder.git",ref = "info"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
