@@ -14,26 +14,32 @@ dispatcher = asyncio_dispatcher.AsyncioDispatcher()
 builder.SetDeviceName("NT-TABLE-IOC:TABLE")
 
 # Create some table records
-columns = builder.WaveformOut("LABELS", initial_value=["enabled", "trigger", "repeats"])
+def strl(arr): return [str(x).lower().encode() for x in arr]
+
+columns = builder.WaveformOut("LABELS", initial_value=strl(["enabled", "trigger", "repeats"]))
 columns.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "+id": "epics:nt/NTTable:1.0",
         "labels":{"+type": "plain", "+channel": "VAL"}
     }
 })
-enabled = builder.WaveformOut("ENABLED", initial_value=np.zeros(10, dtype=np.bool_), always_update=True)
+ev = np.zeros(10, dtype=np.bool_)
+ev[3] = True
+
+enabled = builder.WaveformOut("ENABLED", initial_value=strl(ev), always_update=True)
 enabled.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "value.c1":{"+type": "plain", "+channel": "VAL", "+putorder": 2}
     }
 })
-trigger = builder.WaveformOut("TRIGGER", initial_value=np.arange(10, dtype=np.int8) % 3, always_update=True)
+tr = [b"Option %d" % (i % 3 + 1) for i in range(10)]
+trigger = builder.WaveformOut("TRIGGER", initial_value=tr, always_update=True)
 trigger.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "value.c2":{"+type": "plain", "+channel": "VAL", "+putorder": 2}
     }
 })
-repeats = builder.WaveformOut("REPEATS", initial_value=np.arange(10, dtype=np.int16), always_update=True)
+repeats = builder.WaveformOut("REPEATS", initial_value=strl(np.arange(10, dtype=np.int16)), always_update=True)
 repeats.add_info("Q:group", {
     "NT-TABLE-IOC:TABLE":{
         "value.c3":{"+type": "plain", "+channel": "VAL", "+putorder": 2}
@@ -51,24 +57,24 @@ def switch_editable(e):
 
 
 editable = builder.mbbOut("EDITABLE", "No", "Yes", initial_value=0, on_update=switch_editable)
-editable_start = records.ao("EDITABLE:START", VAL=1, MDEL=-1, OUT=PP(editable))
-editable_start.add_info("Q:group", {
-    "NT-TABLE-IOC:TABLE":{
-        "_start":{"+type":"proc",
-                "+channel":"PROC",
-                "+putorder":1,
-                "+trigger":"*"}
-    }
-})
-editable_end = records.ao("EDITABLE:END", VAL=0, MDEL=-1, OUT=PP(editable))
-editable_end.add_info("Q:group", {
-    "NT-TABLE-IOC:TABLE":{
-        "_end":{"+type":"proc",
-                "+channel":"PROC",
-                "+putorder":3,
-                "+trigger":"*"}
-    }
-})
+# editable_start = records.ao("EDITABLE:START", VAL=1, MDEL=-1, OUT=PP(editable))
+# editable_start.add_info("Q:group", {
+#     "NT-TABLE-IOC:TABLE":{
+#         "_start":{"+type":"proc",
+#                 "+channel":"PROC",
+#                 "+putorder":1,
+#                 "+trigger":"*"}
+#     }
+# })
+# editable_end = records.ao("EDITABLE:END", VAL=0, MDEL=-1, OUT=PP(editable))
+# editable_end.add_info("Q:group", {
+#     "NT-TABLE-IOC:TABLE":{
+#         "_end":{"+type":"proc",
+#                 "+channel":"PROC",
+#                 "+putorder":3,
+#                 "+trigger":"*"}
+#     }
+# })
 
 # Boilerplate get the IOC started
 WriteRecords("/dev/stdout", header="######################\n")
@@ -82,7 +88,7 @@ async def update():
         while True:
             if should_update:
                 r = repeats.get()
-                r[0] += 1
+                r[0] = b"%d" % (int(r[0])+1)
                 repeats.set(r)
             await asyncio.sleep(1)
     except:
