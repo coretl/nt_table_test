@@ -17,7 +17,7 @@ normative types that allow these features to be expressed over PVA.
 Installation Instructions
 -------------------------
 
-To run any of the examples below, do the following:
+To run any of the examples below, do the following::
 
     $ git clone https://github.com/thomascobb/nt_table_test.git
     $ cd nt_table_test
@@ -27,7 +27,7 @@ Enums with 128 entries and 30 character strings
 -----------------------------------------------
 
 This was the first requirement that pushed us from CA to PVA. This can be done
-at the moment with QSRV or P4P, although QSRV needs
+at the moment with QSRV, although it needs
 https://github.com/epics-base/pva2pva/issues/47 to allow typeids to be added to
 custom structures.
 
@@ -87,15 +87,18 @@ so they do not need to be appear for scalar types that do not support them
 Descriptions on everything
 --------------------------
 
-The ``display_t`` has a ``description``, but there are a number of ``descriptor``s
-in the normative types spec. I don't know the difference, but it makes sense to me
-that ``description`` belongs in ``display``. This is currently missing from
-``NTEnum``, so I propose that we instead use an ``NTScalar<uint>`` instead 
-with the above ``display_t`` addition of ``enumLabels``.
+The ``display_t`` has a ``description``, but there are a number of references to
+``descriptor`` in the normative types spec. I don't know the difference, but it
+makes sense to me that ``description`` belongs in ``display``. This is currently
+missing from ``NTEnum``, so I propose that we instead use an ``NTScalar<uint>``
+instead with the above ``display_t`` addition of ``enumLabels``.
 
-I note that the ``NTTable`` is missing a ``description``, but this could be 
-added at the root of the structure, or an extra level added into the ``NTTable``
-``display`` structure, although if I was doing that I'd move the labels there::
+Aside
+-----
+
+I note that the ``NTTable`` is missing a ``description``, this could be added at
+the root of the structure, or an extra level added into the ``NTTable``
+``display`` structure, although if I was doing that I'd move the labels there:
 
 .. code-block::
 
@@ -238,7 +241,9 @@ At the moment, metadata can be added to columns of the table widget to allow
 enums and checkboxes. With the above changes it would be possible to use the
 metadata from the NTTable to populate these. I believe that the table widget
 currently only accepts strings so I have to convert to these in an embedded
-script::
+script:
+
+.. code-block:: python
 
     from org.csstudio.display.builder.runtime.script import PVUtil, ScriptUtil
     

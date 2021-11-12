@@ -7,10 +7,7 @@ from p4p.server import Server
 from p4p.server.asyncio import SharedPV
 from p4p.wrapper import Value
 
-enum_labels = ["ZERO", "ONE", "MANY"]
-old_enum = SharedPV(nt=NTEnum(), initial=dict(index=1, choices=enum_labels))
-
-
+# Some display types
 common_display_fields = [("description", "s")]
 enum_display_fields = common_display_fields + [("enumLabels", "as")]
 form = ("S", "enum_t", [("index", "i"), ("choices", "as")])
@@ -22,6 +19,11 @@ float_display_fields = common_display_fields + [
     ("form", form),
 ]
 
+# An original enum
+enum_labels = ["ZERO", "ONE", "MANY"]
+old_enum = SharedPV(nt=NTEnum(), initial=dict(index=1, choices=enum_labels))
+
+# A new enum
 enum_display = ("display", ("S", "display_t", enum_display_fields))
 new_enum = SharedPV(
     nt=NTScalar("I", extra=[enum_display]),
@@ -34,6 +36,7 @@ new_enum = SharedPV(
     ),
 )
 
+# An original table
 columns = [("enum", "aI"), ("checkBox", "a?"), ("string", "as"), ("float64", "ad")]
 table_value = dict(
     labels=["Enum", "Check Box", "String", "Float 64"],
@@ -44,9 +47,9 @@ table_value = dict(
         float64=[3.5, 2.5, 1.5],
     ),
 )
-
 old_table = SharedPV(initial=Value(NTTable.buildType(columns), table_value))
 
+# A new table
 column_display_fields = [
     ("enum", ("S", "display_t", enum_display_fields)),
     ("checkBox", ("S", "display_t", common_display_fields)),
@@ -86,6 +89,7 @@ new_table = SharedPV(
 )
 
 
+# Run up the server
 async def run():
     with Server(
         providers=[
