@@ -6,8 +6,12 @@ name = "pypi"
 [packages]
 softioc = "*"
 epicsdbbuilder = {editable = true,git = "https://github.com/dls-controls/epicsdbbuilder.git",ref = "info"}
+p4p = "*"
 
 [dev-packages]
+mypy = "*"
+flake8 = "*"
+black = "*"
 
-[requires]
-python_version = "3.8"
+[pipenv]
+allow_prereleases = true
