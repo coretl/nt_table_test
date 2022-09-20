@@ -55,7 +55,7 @@ columns.add_info(
         }
     },
 )
-enum_col = builder.WaveformOut("ENUM", initial_value=[0, 1, 2], always_update=True)
+enum_col = builder.WaveformOut("ENUM", initial_value=[b"ZERO", b"ONE", b"MANY"], always_update=True)
 enum_col.add_info(
     "Q:group",
     {"QSRV:TABLE": {"value.c1": {"+type": "plain", "+channel": "VAL", "+putorder": 2}}},
@@ -95,11 +95,11 @@ should_update = True
 
 
 def switch_editable(e):
+    global should_update
+    should_update = e == 0
     if not e:
         # Push values to hardware
-        print("Set", {r: globals()[r].get() for r in columns.get()})
-    global should_update
-    should_update = not e
+        print("Set", enum_col.get(), check_box.get(), string.get(), float_64.get())
 
 
 editable = builder.mbbOut(
@@ -150,11 +150,12 @@ async def update():
             if should_update:
                 check_box.set((check_box.get() + 1) % 2)
                 float_64.set(float_64.get() + 1)
+                enum_col.set([(b"ZERO", b"ONE", b"MANY")[(old_enum.get() + i) % 3] for i in range(3)])
     except Exception:
         logging.exception("bad")
 
 
-asyncio.run_coroutine_threadsafe(update(), dispatcher.loop)
+dispatcher(update)
 
 # Finally leave the IOC running with an interactive shell.
 softioc.interactive_ioc(globals())
